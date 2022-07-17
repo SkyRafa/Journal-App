@@ -10,12 +10,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
 
 export interface JournalEntryType {
-  id: number;
+  id?: number;
   entry: string;
-  feelingState: number;
+  feelingState?: number;
   emailHashed: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: any;
+  updatedAt: any;
 }
 
 const App = () => {

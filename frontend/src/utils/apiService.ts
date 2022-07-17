@@ -1,4 +1,5 @@
 import axios from "axios";
+import { JournalEntryType } from "../App";
 
 const apiOrigin = "http://localhost:8000";
 
@@ -29,10 +30,21 @@ export const getEntries = async (token: any, email: string) => {
   }
 };
 
-export const postEntry = async (token: any, email: string, body: object) => {
+export const postEntry = async (token: any, body: JournalEntryType) => {
   try {
     const response = await callApi(`/journalEntries`, "post", body, token);
     response.data.feelingState = parseInt(response.data.feelingState);
+    console.log("22222", response.data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const editEntry = async (token: any, body: JournalEntryType) => {
+  try {
+    const response = await callApi(`/journalEntries/?id=${body.id}`, "put", body, token);
+    console.log("response", response);
     return response.data;
   } catch (error) {
     throw error;

@@ -1,22 +1,27 @@
 import { useState, FunctionComponent, useEffect, useContext, MouseEvent } from "react";
-import { postEntry } from "../utils/apiService";
+import { postEntry, editEntry } from "../utils/apiService";
 import { useAuth0 } from "@auth0/auth0-react";
 import { JournalEntryType } from "../App";
 
 interface EntryFormProps {
-  myJournalEntries: JournalEntryType[];
-  setMyJournalEntries: (myJournalEntries: JournalEntryType[]) => void;
+  handleNewJournalEntry: (newJournalEntry: JournalEntryType) => void;
+  journalEntryToBeEditted?: JournalEntryType;
+  isEditting?: boolean;
 }
 
-interface FormProps {
-  entry: string;
-  feelingState: string;
-  emailHashed: string;
-}
+const emptyEntryForm = {
+  id: 0,
+  entry: "",
+  feelingState: 0,
+  emailHashed: "",
+  createdAt: "",
+  updatedAt: "",
+};
 
 export const EntryForm: FunctionComponent<EntryFormProps> = ({
-  myJournalEntries,
-  setMyJournalEntries,
+  handleNewJournalEntry,
+  journalEntryToBeEditted = emptyEntryForm,
+  isEditting = false,
 }) => {
   const { user, getAccessTokenSilently } = useAuth0();
 
@@ -25,28 +30,36 @@ export const EntryForm: FunctionComponent<EntryFormProps> = ({
       return await getAccessTokenSilently();
     } catch (error) {}
   };
-  //newRestaurant state is only used in the frontend, thus actual value of idRestaurant does not matter here, and can be set to whatevah
-  const emptyEntryForm = {
-    entry: "",
-    feelingState: "",
-    emailHashed: "",
-  };
 
   //newMenu state is only used in the frontend, thus actual value of idMenu/idRestaurant does not matter here, and can be set to whatevah
   //   const emptyNewMenuForm = { idMenu: 0, name: "", idRestaurant: 0 };
   //   const emptyNewMenuItemForm = { idMenuItem: 0, name: "", idMenu: 0, price: "" };
 
-  const [newJournalEntry, setNewJournalEntry] = useState<FormProps>(emptyEntryForm);
+  const [newJournalEntry, setNewJournalEntry] = useState<JournalEntryType>(
+    isEditting ? journalEntryToBeEditted! : emptyEntryForm
+  );
   //   const [idRestaurantSelected, setIdRestaurantSelected] = useState<number>(0);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    // const result = await axios.post("http://localhost:8000/restaurants", { ...newRestaurant });
-    const result = postEntry(await genericToken(), user?.email!, {
-      ...newJournalEntry,
-    });
-    const newEntry = await result;
-    setMyJournalEntries([...myJournalEntries, newEntry]);
+    let result;
+    if (!isEditting) {
+      console.log("is Editting???", isEditting);
+      setNewJournalEntry({ ...newJournalEntry, emailHashed: user?.email! });
+      console.log("1111", newJournalEntry);
+      result = await postEntry(await genericToken(), {
+        ...newJournalEntry,
+      });
+      console.log("333333:", result);
+    } else {
+      console.log("zzzz", newJournalEntry);
+      result = editEntry(await genericToken(), {
+        ...newJournalEntry,
+      });
+      const newEntry = await result;
+      console.log("BEAR", newEntry);
+      handleNewJournalEntry(newEntry);
+    }
 
     //adds the restaurant to our frontend and updates idRestaurant with its actual value from the database
     // addRestaurant({ ...newRestaurant, idRestaurant: result.data.insertId });
@@ -62,14 +75,14 @@ export const EntryForm: FunctionComponent<EntryFormProps> = ({
     <>
       {user && (
         <form onSubmit={handleSubmit}>
-          <h2>Add a journal entry</h2>
+          {!isEditting && <h2>Add a journal entry</h2>}
           <div>
             {journalEntryFormFields.map((journalEntryFormField) => (
               <div key={journalEntryFormField.input}>
                 <label>{journalEntryFormField.label}</label>
                 <input
                   type="text"
-                  value={newJournalEntry[journalEntryFormField.input as keyof FormProps]}
+                  value={newJournalEntry[journalEntryFormField.input as keyof JournalEntryType]}
                   onChange={(e) =>
                     setNewJournalEntry({
                       ...newJournalEntry,

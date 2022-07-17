@@ -2,6 +2,7 @@ import { FunctionComponent } from "react";
 import "../App.css";
 import { JournalEntryType } from "../App";
 import { EntryForm } from "../components/entryForm";
+import { JournalEntryCard } from "../components/JournalEntryCard";
 
 interface HomeProps {
   myJournalEntries: JournalEntryType[];
@@ -9,17 +10,18 @@ interface HomeProps {
 }
 
 export const Home: FunctionComponent<HomeProps> = ({ myJournalEntries, setMyJournalEntries }) => {
+  const handleNewJournalEntry = (newJournalEntry: JournalEntryType) => {
+    setMyJournalEntries([...myJournalEntries, newJournalEntry]);
+  };
   return (
     <>
-      <EntryForm
-        myJournalEntries={myJournalEntries}
-        setMyJournalEntries={setMyJournalEntries}
-      ></EntryForm>
+      <EntryForm handleNewJournalEntry={handleNewJournalEntry}></EntryForm>
       {myJournalEntries?.map((myJournalEntry) => (
-        <div key={myJournalEntry.id}>
-          <p>{myJournalEntry.entry}</p>
-          <p>{myJournalEntry.feelingState}</p>
-        </div>
+        <JournalEntryCard
+          key={myJournalEntry.id}
+          myJournalEntry={myJournalEntry}
+          handleNewJournalEntry={handleNewJournalEntry}
+        />
       ))}
     </>
   );
