@@ -1,12 +1,12 @@
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import { JournalEntryType } from "../App";
+import { JournalEntryType } from "../contexts/JournalEntriesContext";
 import { useState, FunctionComponent } from "react";
 import { EntryForm } from "./entryForm";
 
 interface JournalEntryCardProps {
   myJournalEntry: JournalEntryType;
-  handleNewJournalEntry: (myJournalEntry: JournalEntryType) => void;
+  handleNewJournalEntry: (myJournalEntry: JournalEntryType, isEditting: boolean) => void;
 }
 
 export const JournalEntryCard: FunctionComponent<JournalEntryCardProps> = ({
@@ -16,7 +16,7 @@ export const JournalEntryCard: FunctionComponent<JournalEntryCardProps> = ({
   const [isEditting, setIsEditting] = useState(false);
   //   const updateEntry = () => {};
   return (
-    <div>
+    <div style={{ border: "1px solid black", margin: "5px" }}>
       <Card style={{ width: "18rem" }}>
         {/* <Card.Img variant="top" src="holder.js/100px180" /> */}
         <Card.Body>
@@ -28,14 +28,12 @@ export const JournalEntryCard: FunctionComponent<JournalEntryCardProps> = ({
             </>
           )}
           {isEditting && (
-            <>
-              <>{console.log("hehehe", myJournalEntry)}</>
-              <EntryForm
-                handleNewJournalEntry={handleNewJournalEntry}
-                journalEntryToBeEditted={myJournalEntry}
-                isEditting={isEditting}
-              />
-            </>
+            <EntryForm
+              handleNewJournalEntry={handleNewJournalEntry}
+              journalEntryToBeEditted={myJournalEntry}
+              isEditting={isEditting}
+              setIsEditting={setIsEditting}
+            />
           )}
         </Card.Body>
       </Card>

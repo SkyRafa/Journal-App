@@ -1,12 +1,13 @@
-import { useState, FunctionComponent, useEffect, useContext, MouseEvent } from "react";
+import { useState, FunctionComponent, useContext } from "react";
 import { postEntry, editEntry } from "../utils/apiService";
 import { useAuth0 } from "@auth0/auth0-react";
-import { JournalEntryType } from "../App";
+import { JournalEntryType, JournalEntriesContext } from "../contexts/JournalEntriesContext";
 
 interface EntryFormProps {
-  handleNewJournalEntry: (newJournalEntry: JournalEntryType) => void;
+  handleNewJournalEntry: (newJournalEntry: JournalEntryType, isEditting: boolean) => void;
   journalEntryToBeEditted?: JournalEntryType;
   isEditting?: boolean;
+  setIsEditting?: (isEditting: boolean) => void;
 }
 
 const emptyEntryForm = {
@@ -22,8 +23,10 @@ export const EntryForm: FunctionComponent<EntryFormProps> = ({
   handleNewJournalEntry,
   journalEntryToBeEditted = emptyEntryForm,
   isEditting = false,
+  setIsEditting,
 }) => {
-  const { user, getAccessTokenSilently } = useAuth0();
+  const { user = {}, getAccessTokenSilently } = useAuth0();
+  const { myJournalEntries, setMyJournalEntries } = useContext(JournalEntriesContext);
 
   const genericToken = async () => {
     try {
@@ -44,26 +47,19 @@ export const EntryForm: FunctionComponent<EntryFormProps> = ({
     event.preventDefault();
     let result;
     if (!isEditting) {
-      console.log("is Editting???", isEditting);
-      setNewJournalEntry({ ...newJournalEntry, emailHashed: user?.email! });
-      console.log("1111", newJournalEntry);
-      result = await postEntry(await genericToken(), {
-        ...newJournalEntry,
-      });
-      console.log("333333:", result);
+      const newJournalEntryWithEmail = { ...newJournalEntry, emailHashed: user.email || "" };
+      setNewJournalEntry(newJournalEntryWithEmail);
+      result = await postEntry(await genericToken(), newJournalEntry);
+      setNewJournalEntry(emptyEntryForm);
     } else {
-      console.log("zzzz", newJournalEntry);
-      result = editEntry(await genericToken(), {
-        ...newJournalEntry,
-      });
-      const newEntry = await result;
-      console.log("BEAR", newEntry);
-      handleNewJournalEntry(newEntry);
+      result = await editEntry(await genericToken(), newJournalEntry);
+      const index = myJournalEntries.findIndex((entry) => entry.id === newJournalEntry.id);
+      const entriesArray = [...myJournalEntries];
+      entriesArray[index] = newJournalEntry;
+      setMyJournalEntries(entriesArray);
     }
-
-    //adds the restaurant to our frontend and updates idRestaurant with its actual value from the database
-    // addRestaurant({ ...newRestaurant, idRestaurant: result.data.insertId });
-    // setNewRestaurant(emptyRestaurantForm);
+    handleNewJournalEntry(result, isEditting);
+    setIsEditting!(false);
   };
 
   const journalEntryFormFields = [

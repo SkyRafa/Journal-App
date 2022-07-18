@@ -1,17 +1,15 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext } from "react";
 import "../App.css";
-import { JournalEntryType } from "../App";
+import { JournalEntryType } from "../contexts/JournalEntriesContext";
 import { EntryForm } from "../components/entryForm";
 import { JournalEntryCard } from "../components/JournalEntryCard";
+import { JournalEntriesContext } from "../contexts/JournalEntriesContext";
 
-interface HomeProps {
-  myJournalEntries: JournalEntryType[];
-  setMyJournalEntries: (myJournalEntries: JournalEntryType[]) => void;
-}
-
-export const Home: FunctionComponent<HomeProps> = ({ myJournalEntries, setMyJournalEntries }) => {
-  const handleNewJournalEntry = (newJournalEntry: JournalEntryType) => {
-    setMyJournalEntries([...myJournalEntries, newJournalEntry]);
+export const Home: FunctionComponent = () => {
+  const { myJournalEntries, setMyJournalEntries } = useContext(JournalEntriesContext);
+  const handleNewJournalEntry = (newJournalEntry: JournalEntryType, isEditting: boolean) => {
+    if (!isEditting) setMyJournalEntries([...myJournalEntries, newJournalEntry]);
+    // else setMyJournalEntries([...myJournalEntries]);
   };
   return (
     <>

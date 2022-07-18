@@ -1,5 +1,5 @@
 import axios from "axios";
-import { JournalEntryType } from "../App";
+import { JournalEntryType } from "../contexts/JournalEntriesContext";
 
 const apiOrigin = "http://localhost:8000";
 
@@ -45,7 +45,7 @@ export const editEntry = async (token: any, body: JournalEntryType) => {
   try {
     const response = await callApi(`/journalEntries/?id=${body.id}`, "put", body, token);
     console.log("response", response);
-    return response.data;
+    return response;
   } catch (error) {
     throw error;
   }

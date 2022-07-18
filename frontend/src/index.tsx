@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { GlobalContext } from "./contexts/index";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
@@ -15,7 +16,9 @@ root.render(
       audience="https://journal/api"
       scope="read:journalEntries"
     >
-      <App />
+      <GlobalContext>
+        <App />
+      </GlobalContext>
     </Auth0Provider>
   </React.StrictMode>
 );

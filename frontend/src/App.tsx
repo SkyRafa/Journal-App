@@ -4,36 +4,10 @@ import "./App.css";
 import LoginButton from "./components/LoginButton";
 import LogoutButton from "./components/LogoutButton";
 import Profile from "./components/Profile";
-import { getEntries } from "./utils/apiService";
-import { useAuth0 } from "@auth0/auth0-react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
 
-export interface JournalEntryType {
-  id?: number;
-  entry: string;
-  feelingState?: number;
-  emailHashed: string;
-  createdAt: any;
-  updatedAt: any;
-}
-
 const App = () => {
-  const [myJournalEntries, setMyJournalEntries] = useState<JournalEntryType[]>([]);
-  const { user, getAccessTokenSilently } = useAuth0();
-  const genericToken = async () => {
-    try {
-      return await getAccessTokenSilently();
-    } catch (error) {}
-  };
-  const getMyEntries = async () => {
-    const myEntriesArray = await getEntries(await genericToken(), `${user?.email}`);
-    setMyJournalEntries(myEntriesArray);
-  };
-  useEffect(() => {
-    user?.email && getMyEntries();
-  }, [user]);
-
   return (
     <div className="App">
       <header className="App-header">
@@ -46,15 +20,7 @@ const App = () => {
         <div className="App">
           <Routes>
             {/* <Route path="/about" element={<About />} /> */}
-            <Route
-              path="/"
-              element={
-                <Home
-                  myJournalEntries={myJournalEntries}
-                  setMyJournalEntries={setMyJournalEntries}
-                />
-              }
-            />
+            <Route path="/" element={<Home />} />
           </Routes>
         </div>
       </Router>

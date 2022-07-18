@@ -26,4 +26,16 @@ router.post(`/`, readEntriesScope, async (req, res) => {
   }
 });
 
+router.put(`/`, readEntriesScope, async (req, res) => {
+  try {
+    let journalentry = await JournalEntry.update(
+      { entry: req.body.entry, feelingState: req.body.feelingState },
+      { where: { id: req.query.id } }
+    );
+    res.status(201).send(journalentry);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 export default router;
